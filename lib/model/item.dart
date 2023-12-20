@@ -1,6 +1,3 @@
-import 'package:flutter/material.dart';
-import 'package:uuid/uuid.dart';
-
 class Item {
   final String id;
   final String title;
@@ -20,7 +17,7 @@ class Item {
     this.isDone = false,
   });
 
-  set setisDone(bool state) {
+  /*set setDone(bool state) {
     isDone = state;
-  }
+  }*/
 }
