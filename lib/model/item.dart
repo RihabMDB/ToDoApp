@@ -6,7 +6,7 @@ class Item {
   final String title;
   final String description;
   final String date;
-  final String category;
+  final CategoryEnum category;
   bool isDone;
 
   Item({
@@ -16,7 +16,7 @@ class Item {
     //this.urlImage,
     this.description = "",
     this.date = "18/10/2023",
-    this.category = "",
+    this.category = CategoryEnum.All,
     this.isDone = false,
   });
 
@@ -24,3 +24,5 @@ class Item {
     isDone = state;
   }
 }
+
+enum CategoryEnum { All, Education, Personnal, Work, Nothing }

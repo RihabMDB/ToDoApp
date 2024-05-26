@@ -1,17 +1,18 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
 import '../model/item.dart';
 
-class ListItemWidget extends StatelessWidget {
+class ItemWidget extends StatelessWidget {
   final Item item;
   final Animation<double> animation;
   final VoidCallback removeCallback;
-
-  const ListItemWidget({
+  final VoidCallback onToDoChanged;
+  final Function(bool?)? onChange;
+  const ItemWidget({
     required this.item,
     required this.animation,
     required this.removeCallback,
+    required this.onToDoChanged,
+    this.onChange,
     Key? key,
   }) : super(key: key);
 
@@ -26,27 +27,42 @@ class ListItemWidget extends StatelessWidget {
           color: Color.fromARGB(255, 27, 46, 115),
         ),
         child: ListTile(
+          onTap: () => onChange,
+//onToDoChanged(),
           contentPadding: EdgeInsets.all(16),
           leading: Icon(
             item.isDone ? Icons.check_box : Icons.check_box_outline_blank,
             color: Colors.grey,
           ),
-          /*CircleAvatar(
-            radius: 32,
-            backgroundImage: NetworkImage(item.urlImage),
-          ),*/
           title: Text(
             item.title,
-            style: const TextStyle(
-                color: Colors.white, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              decoration: item.isDone ? TextDecoration.lineThrough : null,
+            ),
           ),
-          subtitle: const Padding(
+          subtitle: Padding(
             padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
-            child: Text(
-              " 21 Oct",
-              style: TextStyle(
-                color: Colors.white,
-              ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    item.description,
+                    style: TextStyle(
+                      color: Colors.white,
+                    ),
+                    maxLines: 1,
+                  ),
+                ),
+                Text(
+                  item.date,
+                  style: TextStyle(
+                    color: Colors.white,
+                  ),
+                ),
+              ],
             ),
           ),
           trailing: IconButton(
@@ -55,13 +71,13 @@ class ListItemWidget extends StatelessWidget {
               color: Colors.white,
             ),
             onPressed: removeCallback,
-            // => removeCallback,
           ),
         ),
       );
 }
 
-Widget CustomCheckBox(bool value) {
+// not used
+Widget customCheckBox(bool value) {
   return Transform.scale(
     scale: 1.5,
     child: Checkbox(
