@@ -3,7 +3,8 @@ import 'package:todolist/widget/searchBoxWidget.dart';
 import 'data/list_items.dart';
 import 'widget/ListProvider.dart';
 import 'widget/listWidget.dart';
-import '../model/item.dart';
+import 'package:todolist/model/item.dart';
+import 'package:todolist/utils/constants/categoryEnum.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -17,10 +18,10 @@ class _HomeScreenState extends State<HomeScreen> {
   int size = List.from(listItemsData).length;
 
   //List<CategoryEnum> categories = [];
-  List<String> selectedCategories = ["All"];
+  List<String> selectedCategories = [CategoryEnum.All.name];
   void onListUpdate() {
     setState(() {
-      if (selectedCategories.contains("All")) {
+      if (selectedCategories.contains(CategoryEnum.All.name)) {
         items = allItems;
       } else if (selectedCategories.isNotEmpty) {
         items = allItems.where((todo) {

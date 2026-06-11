@@ -19,7 +19,6 @@ class ItemWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) =>
       SizeTransition(sizeFactor: animation, child: buildItem());
-
   Widget buildItem() => Container(
         //margin: EdgeInsets.all(8),
         decoration: BoxDecoration(

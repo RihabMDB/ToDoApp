@@ -1,4 +1,5 @@
 import 'package:todolist/model/item.dart';
+import 'package:todolist/utils/constants/categoryEnum.dart';
 
 final List<Item> listItemsData = [
   Item(
@@ -23,13 +24,6 @@ final List<Item> listItemsData = [
       id: "4",
       title: "Marry",
       description: "some thing to do",
-      category: CategoryEnum.Nothing),
+      category: CategoryEnum.NoCategory),
   Item(id: "4", title: "Milk", description: "000 here is"),
 ];
-final List<String> listCotegories = [
-  "Nothing",
-  "Personnal",
-  "Work",
-];
-
-//enum CategoryEnum { All, Personnal, Work }

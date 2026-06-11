@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:todolist/utils/constants/categoryEnum.dart';
 import 'package:todolist/widget/ListProvider.dart';
 import '../model/item.dart';
 import 'item_widget.dart';
@@ -88,7 +89,9 @@ class _ListWidgetState extends State<ListWidget> {
     final newItem = Item(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         title: item.title,
-        description: item.description);
+        description: item.description,
+        category: item.category,
+        date: item.date);
     setState(() {
       items!.insert(newIndex, newItem);
       _listKey.currentState!.insertItem(
@@ -101,7 +104,8 @@ class _ListWidgetState extends State<ListWidget> {
   _showModal() {
     late String title;
     late String description;
-    String category = CategoryEnum.values.first.toString();
+    late String date = _formatDate(DateTime.now());
+    String selectedCategory = CategoryEnum.NoCategory.name;
 
     return showModalBottomSheet(
         context: context,
@@ -111,94 +115,219 @@ class _ListWidgetState extends State<ListWidget> {
           ),
         ),
         builder: (BuildContext context) {
-          return Container(
-            padding: const EdgeInsets.all(20),
-            child: Wrap(
-              spacing: 30,
-              children: <Widget>[
-                const SizedBox(height: 15),
-                TextField(
-                  style: const TextStyle(fontSize: 20),
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20.0)),
-                    hintText: 'Input title',
-                  ),
-                  onChanged: (value) => title = value,
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                TextField(
-                  maxLines: 6,
-                  style: const TextStyle(fontSize: 18),
-                  decoration: InputDecoration(
-                    //contentPadding: EdgeInsets.all(8),
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(18.0)),
-                    hintText: 'Input Notes',
-                  ),
-                  onChanged: (value) => description = value,
-                ),
-                const SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(15.0),
-                        border: Border.all(
-                            // color: Colors.red,
-                            style: BorderStyle.solid,
-                            width: 0.80),
+          return StatefulBuilder(builder: (context, setModalState) {
+            return Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom,
+                left: 20,
+                right: 20,
+                top: 20,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16.0, vertical: 12.0),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20.0),
+                      border: Border.all(
+                        color: Colors.grey[300] ?? Colors.grey,
+                        width: 1.0,
                       ),
-                      /*   child: DropdownButtonHideUnderline(
-                        child: DropdownButton<String>(
-                          value: category,
-                          items: listCotegories
-                              .map<DropdownMenuItem<String>>((String item) {
-                            return DropdownMenuItem(
-                              value: item,
-                              child: Text(
-                                item,
-                              ),
-                            );
-                          }).toList(),
-                          onChanged: (String? newValue) {
-                            setState(() {
-                              category = newValue!;
+                      color: Colors.grey[50],
+                    ),
+                    child: TextField(
+                      style: const TextStyle(fontSize: 16),
+                      decoration: const InputDecoration(
+                        border: InputBorder.none,
+                        hintText: 'task title',
+                        hintStyle: TextStyle(
+                          color: Color.fromARGB(179, 158, 158, 158),
+                          fontSize: 16,
+                        ),
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                      onChanged: (value) => title = value,
+                    ),
+                  ),
+                  const SizedBox(height: 15),
+                  Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16.0, vertical: 12.0),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20.0),
+                        border: Border.all(
+                          color: Colors.grey[300] ?? Colors.grey,
+                          width: 1.0,
+                        ),
+                        color: Colors.grey[50],
+                      ),
+                      child: TextField(
+                        maxLines: 6,
+                        style: const TextStyle(fontSize: 16),
+                        decoration: const InputDecoration(
+                          border: InputBorder.none,
+                          hintText: 'task notes',
+                          hintStyle: TextStyle(
+                            color: Color.fromARGB(179, 158, 158, 158),
+                            fontSize: 16,
+                          ),
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                        onChanged: (value) => description = value,
+                      )),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      // Category button
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () {
+                            _showCategoryModal(context, (category) {
+                              setModalState(() {
+                                selectedCategory = category;
+                              });
                             });
                           },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12.0, vertical: 10.0),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12.0),
+                              border: Border.all(
+                                color: Colors.grey[300] ?? Colors.grey,
+                                width: 1.0,
+                              ),
+                            ),
+                            child: Text(
+                              selectedCategory,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: Colors.black87,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
                         ),
                       ),
-                   */
-                    ),
-                    Align(
-                      alignment: Alignment.bottomRight,
-                      child: FloatingActionButton(
+                      const SizedBox(width: 8),
+                      // Date picker button
+                      GestureDetector(
+                        onTap: () async {
+                          final DateTime? picked = await showDatePicker(
+                            context: context,
+                            initialDate: DateTime.now(),
+                            firstDate: DateTime(2000),
+                            lastDate: DateTime(2101),
+                          );
+                          if (picked != null) {
+                            date = _formatDate(picked);
+                            print(" picked date: $date");
+                          }
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(10.0),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12.0),
+                            border: Border.all(
+                              color: Colors.grey[300] ?? Colors.grey,
+                              width: 1.0,
+                            ),
+                          ),
+                          child: Icon(
+                            Icons.calendar_today,
+                            size: 20,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      // Add button (FAB style)
+                      FloatingActionButton(
+                        mini: true,
                         backgroundColor: const Color.fromARGB(255, 1, 16, 29),
                         onPressed: () {
-                          insertItem(Item(
-                              title: title,
-                              description: description,
-                              category: CategoryEnum.All));
+                          if (title.isNotEmpty) {
+                            insertItem(Item(
+                                title: title,
+                                description: description,
+                                date: date,
+                                category: CategoryEnum.values.firstWhere(
+                                    (e) => e.name == selectedCategory)));
+                            Navigator.pop(context);
+                          }
                         },
                         child: const Icon(
-                          Icons.send_sharp,
-                          size: 20,
-                          color: Color.fromARGB(255, 249, 250, 251),
+                          Icons.send,
+                          size: 18,
+                          color: Colors.white,
                         ),
                       ),
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: 30,
-                )
-              ],
-            ),
-          );
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  const SizedBox(height: 20),
+                ],
+              ),
+            );
+          });
         });
+  }
+
+  void _showCategoryModal(
+      BuildContext context, Function(String) onCategorySelected) {
+    //final categories = CategoryEnum.values.map((e) => e.name).toList();
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(25.0),
+        ),
+      ),
+      builder: (BuildContext context) {
+        return Container(
+          padding: const EdgeInsets.all(20),
+          child: ListView.builder(
+            shrinkWrap: true,
+            itemCount: CategoryEnum.values.length,
+            itemBuilder: (context, index) {
+              return GestureDetector(
+                onTap: () {
+                  onCategorySelected(CategoryEnum.values[index].name);
+                  Navigator.pop(context);
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 16.0, horizontal: 16.0),
+                  decoration: BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(
+                        color: index == CategoryEnum.values.length - 1
+                            ? Colors.transparent
+                            : Colors.grey[200] ?? Colors.grey,
+                      ),
+                    ),
+                  ),
+                  child: Text(
+                    CategoryEnum.values[index].name,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: Colors.black87,
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+
+  static String _formatDate(DateTime date) {
+    final day = date.day.toString().padLeft(2, '0');
+    final month = date.month.toString().padLeft(2, '0');
+    return '$day/$month/${date.year}';
   }
 }

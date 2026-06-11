@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:uuid/uuid.dart';
+import 'package:todolist/utils/constants/categoryEnum.dart';
 
 class Item {
   final String id;
@@ -7,6 +7,7 @@ class Item {
   final String description;
   final String date;
   final CategoryEnum category;
+
   bool isDone;
 
   Item({
@@ -15,14 +16,21 @@ class Item {
     required this.title,
     //this.urlImage,
     this.description = "",
-    this.date = "18/10/2023",
-    this.category = CategoryEnum.All,
+    String? date,
+    this.category = CategoryEnum.NoCategory,
     this.isDone = false,
-  });
+  }) : date = date ?? _formatDate(DateTime.now());
 
   set setisDone(bool state) {
     isDone = state;
   }
-}
 
-enum CategoryEnum { All, Education, Personnal, Work, Nothing }
+
+  bool get getIsDone => isDone;
+
+  static String _formatDate(DateTime date) {
+    final day = date.day.toString().padLeft(2, '0');
+    final month = date.month.toString().padLeft(2, '0');
+    return '$day/$month/${date.year}';
+  }
+}
