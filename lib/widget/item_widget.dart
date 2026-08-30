@@ -26,8 +26,7 @@ class ItemWidget extends StatelessWidget {
           color: Color.fromARGB(255, 27, 46, 115),
         ),
         child: ListTile(
-          onTap: () => onChange,
-//onToDoChanged(),
+          onTap: () => onChange?.call(!item.isDone),
           contentPadding: EdgeInsets.all(16),
           leading: Icon(
             item.isDone ? Icons.check_box : Icons.check_box_outline_blank,

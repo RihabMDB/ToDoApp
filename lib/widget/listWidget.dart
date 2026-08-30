@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:todolist/utils/constants/categoryEnum.dart';
 import 'package:todolist/widget/ListProvider.dart';
+import 'package:todolist/services/hive_service.dart';
 import '../model/item.dart';
 import 'item_widget.dart';
 
@@ -19,6 +20,8 @@ class _ListWidgetState extends State<ListWidget> {
   void checkBoxChange(bool? value, int index) {
     setState(() {
       items![index].isDone = value!;
+      // Save to Hive
+      HiveService.updateItem(items![index]);
     });
   }
 
@@ -65,6 +68,9 @@ class _ListWidgetState extends State<ListWidget> {
       items!.removeAt(index);
     });
 
+    // Delete from Hive
+    HiveService.deleteItem(removedItem.id);
+
     // remove it from the animated list
 
     _listKey.currentState!.removeItem(
@@ -99,6 +105,9 @@ class _ListWidgetState extends State<ListWidget> {
         duration: Duration(milliseconds: 600),
       );
     });
+
+    // Save to Hive
+    HiveService.addItem(newItem);
   }
 
   _showModal() {

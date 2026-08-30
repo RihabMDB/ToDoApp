@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:todolist/widget/searchBoxWidget.dart';
-import 'data/list_items.dart';
+import 'package:todolist/services/hive_service.dart';
 import 'widget/ListProvider.dart';
 import 'widget/listWidget.dart';
 import 'package:todolist/model/item.dart';
@@ -13,9 +13,21 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  List<Item> items = List.from(listItemsData);
-  List<Item> allItems = List.from(listItemsData);
-  int size = List.from(listItemsData).length;
+  late List<Item> items;
+  late List<Item> allItems;
+  late int size;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadItems();
+  }
+
+  void _loadItems() {
+    allItems = HiveService.getAllItems();
+    items = allItems;
+    size = items.length;
+  }
 
   //List<CategoryEnum> categories = [];
   List<String> selectedCategories = [CategoryEnum.All.name];
@@ -32,12 +44,27 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  void onSearch(String keyword) {
+    setState(() {
+      if (keyword.isEmpty) {
+        onListUpdate();
+      } else {
+        items = allItems
+            .where((todo) =>
+                todo.title.toLowerCase().contains(keyword.toLowerCase()))
+            .toList();
+        size = items.length;
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListProvider(
       items: items,
       size: size,
       onListUpdate: onListUpdate,
+      onSearch: onSearch,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,

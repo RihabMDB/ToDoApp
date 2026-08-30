@@ -12,15 +12,14 @@ class _SearchBoxWidgetState extends State<SearchBoxWidget> {
   var items, size;
 
   void _runFilter(String enteredKeyword) {
-    /*if (enteredKeyword.isNotEmpty) {
-      setState(() {
-        items = items
-            .where((item) =>
-                item.title.toLowerCase().contains(enteredKeyword.toLowerCase()))
-            .toList();
-        size = items.length;
-      });
-    }*/
+    final provider = ListProvider.of(context);
+    if (provider == null) return;
+
+    if (enteredKeyword.isNotEmpty) {
+      provider.onSearch?.call(enteredKeyword);
+    } else {
+      provider.onListUpdate();
+    }
   }
 
   @override

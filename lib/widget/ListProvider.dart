@@ -4,6 +4,7 @@ import '../model/item.dart';
 
 class ListProvider extends InheritedWidget {
   final void Function() onListUpdate;
+  final void Function(String)? onSearch;
   final List<Item>? items;
   final int size;
   const ListProvider(
@@ -11,7 +12,8 @@ class ListProvider extends InheritedWidget {
       required super.child,
       required this.items,
       required this.size,
-      required this.onListUpdate})
+      required this.onListUpdate,
+      this.onSearch})
       : super(
           key: key,
         );
